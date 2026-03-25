@@ -1,0 +1,196 @@
+/* Research Agent Importer — Admin Styles */
+
+.rai-wrap {
+    max-width: 860px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* Header */
+.rai-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 24px 0 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #dcdcde;
+}
+.rai-header-icon {
+    font-size: 28px;
+    width: 48px;
+    height: 48px;
+    background: #1a1a2e;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #7c6fff;
+}
+.rai-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1d2327;
+    margin: 0;
+    padding: 0;
+}
+.rai-subtitle {
+    color: #646970;
+    margin: 4px 0 0;
+    font-size: 13px;
+}
+
+/* Cards */
+.rai-card {
+    background: #fff;
+    border: 1px solid #dcdcde;
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.05);
+}
+.rai-card-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1d2327;
+    margin: 0 0 16px;
+    padding: 0;
+    border: none;
+}
+
+/* Fields */
+.rai-field-group {
+    margin-bottom: 18px;
+}
+.rai-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: #646970;
+    margin-bottom: 6px;
+}
+.rai-input,
+.rai-select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #c3c4c7;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #1d2327;
+    background: #f9f9f9;
+    transition: border-color .15s;
+    box-sizing: border-box;
+}
+.rai-input:focus,
+.rai-select:focus {
+    border-color: #7c6fff;
+    outline: none;
+    background: #fff;
+    box-shadow: 0 0 0 2px rgba(124,111,255,.15);
+}
+.rai-mono { font-family: "SFMono-Regular", Consolas, monospace; font-size: 12px; }
+
+.rai-copy-row {
+    display: flex;
+    gap: 8px;
+}
+.rai-copy-row .rai-input { flex: 1; }
+
+/* Buttons */
+.rai-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all .15s;
+    white-space: nowrap;
+}
+.rai-btn-primary {
+    background: #7c6fff;
+    color: #fff;
+    border: none;
+}
+.rai-btn-primary:hover { background: #6a5de8; color: #fff; }
+.rai-btn-ghost {
+    background: transparent;
+    color: #646970;
+    border: 1px solid #c3c4c7;
+}
+.rai-btn-ghost:hover { border-color: #7c6fff; color: #7c6fff; background: transparent; }
+.rai-btn-danger-ghost {
+    background: transparent;
+    color: #d63638;
+    border: 1px solid #d63638;
+    font-size: 12px;
+    padding: 6px 12px;
+}
+.rai-btn-danger-ghost:hover { background: #d6363810; }
+
+/* Callout */
+.rai-callout {
+    background: #f6f7f7;
+    border-left: 3px solid #7c6fff;
+    border-radius: 0 6px 6px 0;
+    padding: 12px 16px;
+    margin-top: 16px;
+    font-size: 13px;
+    color: #3c434a;
+    line-height: 1.6;
+}
+.rai-code {
+    display: block;
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-size: 12px;
+    margin-top: 6px;
+    color: #1d2327;
+    word-break: break-all;
+}
+
+/* Grid */
+.rai-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+@media (max-width: 600px) { .rai-grid-2 { grid-template-columns: 1fr; } }
+
+/* Plugin status rows */
+.rai-plugin-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: #f6f7f7;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #3c434a;
+}
+.rai-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 10px;
+    letter-spacing: .04em;
+}
+.rai-badge-active   { background: #edfaef; color: #1a7f37; border: 1px solid #a8efbc; }
+.rai-badge-inactive { background: #f6f7f7; color: #8c8f94; border: 1px solid #dcdcde; }
+
+/* Pre / code */
+.rai-pre {
+    background: #1d2327;
+    color: #c8d3db;
+    padding: 16px 20px;
+    border-radius: 8px;
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-size: 12px;
+    line-height: 1.7;
+    overflow-x: auto;
+    white-space: pre;
+    margin: 0;
+}
+.rai-desc { font-size: 13px; color: #646970; margin: 0; line-height: 1.6; }

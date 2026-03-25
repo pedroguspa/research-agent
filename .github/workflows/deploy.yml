@@ -1,0 +1,65 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Deploy Research Agent → GitHub Pages
+#
+# SETUP (one-time):
+#   1. Push this repo to GitHub (public repo).
+#   2. Settings → Pages → Source → "GitHub Actions"
+#   3. Settings → Secrets → Actions → New secret:
+#        VITE_PROXY_URL  →  https://research-agent-proxy.<subdomain>.workers.dev
+#      (Deploy the worker first so you have its URL — see deploy-worker.yml)
+#
+# Your site: https://<username>.github.io/<repo>/
+# ─────────────────────────────────────────────────────────────────────────────
+
+name: CI / Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - run: npm ci
+
+      - name: Build
+        env:
+          VITE_BASE_PATH: /${{ github.event.repository.name }}/
+          # URL of the Cloudflare Worker proxy — NO key in the frontend bundle
+          VITE_PROXY_URL: ${{ secrets.VITE_PROXY_URL }}
+        run: npm run build
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment

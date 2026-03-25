@@ -1,0 +1,18 @@
+# wrangler.toml — Cloudflare Worker configuration
+#
+# Replace <YOUR_CF_ACCOUNT_ID> with the value from:
+#   dash.cloudflare.com → (right sidebar) Account ID
+#
+# The worker will be reachable at:
+#   https://research-agent-proxy.<your-subdomain>.workers.dev
+
+name       = "research-agent-proxy"
+main       = "worker/index.js"
+account_id = "<YOUR_CF_ACCOUNT_ID>"        # ← replace this
+compatibility_date = "2024-09-23"
+
+# Uncomment to use a custom route on your own domain:
+# routes = [{ pattern = "api.yourdomain.com/v1/*", zone_name = "yourdomain.com" }]
+
+[observability]
+enabled = true    # free request logs in the CF dashboard

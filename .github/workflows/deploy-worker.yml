@@ -1,0 +1,64 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Deploy Cloudflare Worker proxy
+#
+# SETUP (one-time):
+#   Add these three secrets in GitHub → Settings → Secrets → Actions:
+#
+#   CF_API_TOKEN       → Cloudflare API token with "Edit Workers" permission
+#                        dash.cloudflare.com → My Profile → API Tokens
+#                        → Create Token → "Edit Cloudflare Workers" template
+#
+#   CF_ACCOUNT_ID      → dash.cloudflare.com → (right sidebar) Account ID
+#
+#   ANTHROPIC_API_KEY  → Your sk-ant-... key (stored as a Worker Secret,
+#                        NOT baked into code or the bundle)
+#
+# The worker deploys whenever worker/index.js or wrangler.toml changes on main.
+# ─────────────────────────────────────────────────────────────────────────────
+
+name: Deploy Cloudflare Worker
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "worker/**"
+      - "wrangler.toml"
+  workflow_dispatch:
+
+concurrency:
+  group: worker-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy-worker:
+    name: Deploy Worker
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Wrangler
+        run: npm install -g wrangler
+
+      # Inject the Anthropic key as a Worker Secret so it's stored
+      # encrypted inside Cloudflare and never touches the filesystem.
+      - name: Push ANTHROPIC_API_KEY as Worker Secret
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+        run: |
+          echo "${{ secrets.ANTHROPIC_API_KEY }}" | \
+            wrangler secret put ANTHROPIC_API_KEY
+
+      - name: Deploy worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+        run: wrangler deploy
