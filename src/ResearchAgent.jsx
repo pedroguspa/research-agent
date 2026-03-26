@@ -155,12 +155,15 @@ Summaries: ${JSON.stringify(summaries)}
 Validation notes: ${JSON.stringify(validations)}
 Repository: ${repoName || "research-output"}
 
-Write a complete Markdown document with:
+Write a complete Markdown document with (keep it concise to fit within the token limit):
 - A top-level title and date
-- Table of contents
-- One section per category with heading, polished summary, and bullet key points
-- A brief concluding remarks section
+- Table of contents with at most 3 entries
+- One section per category with heading, 1 polished paragraph summary, and at most 3 bullet key points
+- A brief concluding remarks section (2-4 sentences)
 - Footer with generation timestamp
+
+Output must be valid JSON only: exactly one object with a single top-level key "markdown".
+Do not include any extra commentary. Do not include code fences.
 
 Return a JSON object: { "markdown": "...full markdown string..." }
 Return ONLY valid JSON, no markdown fences.`,
@@ -209,7 +212,15 @@ async function callClaude(prompt, useWebSearch = false) {
 
 function parseJSON(raw) {
   const clean = raw.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-  return JSON.parse(clean);
+  const start = clean.indexOf("{");
+  const end = clean.lastIndexOf("}");
+  const candidate = start !== -1 && end !== -1 && end > start ? clean.slice(start, end + 1) : clean;
+  try {
+    return JSON.parse(candidate);
+  } catch (e) {
+    const snippet = candidate.slice(0, 420) + (candidate.length > 420 ? "..." : "");
+    throw new Error(`Model returned invalid JSON (${e.message}). Snippet: ${snippet}`);
+  }
 }
 
 // ── Sub-components ───────────────────────────────────────────────────────────
@@ -641,7 +652,12 @@ export default function ResearchAgent() {
                 slug: <span style={{ color: "var(--text)" }}>{wpResult.slug}</span>
               </div>
               <div className="actions-row" style={{ marginTop: 12 }}>
-                <a href={wpResult.url} target="_blank" rel="noopener" className="btn btn-green btn-sm">
+                <a
+                  href={wpResult.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-green btn-sm"
+                >
                   ↗ View Post
                 </a>
               </div>
