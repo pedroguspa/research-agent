@@ -39,6 +39,7 @@ function corsHeaders(origin) {
 export default {
   async fetch(request, env) {
     const origin = request.headers.get("Origin") || "";
+    const anthropicApiKey = env?.ANTHROPIC_API_KEY;
 
     // ── CORS pre-flight ──
     if (request.method === "OPTIONS") {
@@ -76,12 +77,19 @@ export default {
     // ── Guardrails: cap max_tokens to prevent runaway usage ──
     if (body.max_tokens > 4000) body.max_tokens = 4000;
 
+    if (!anthropicApiKey) {
+      return new Response(
+        JSON.stringify({ error: "Server misconfiguration: missing ANTHROPIC_API_KEY" }),
+        { status: 500, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
     // ── Forward to Anthropic ──
     const upstream = await fetch(`${ANTHROPIC_API}/v1/messages`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-api-key": env.ANTHROPIC_API_KEY,          // secret — never in source
+        "x-api-key": anthropicApiKey,
         "anthropic-version": ANTHROPIC_VERSION,
       },
       body: JSON.stringify(body),

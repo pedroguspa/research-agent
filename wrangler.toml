@@ -8,7 +8,7 @@
 
 name       = "research-agent-proxy"
 main       = "worker/index.js"
-account_id = "<YOUR_CF_ACCOUNT_ID>"        # ← replace this
+account_id = "ac9b6bd2d863dff49307ae1282990ef8"        # ← replace this
 compatibility_date = "2024-09-23"
 
 # Uncomment to use a custom route on your own domain:
