@@ -35,11 +35,31 @@ function corsHeaders(origin) {
   };
 }
 
+function jsonResponse(status, payload, origin) {
+  const headers = { "Content-Type": "application/json" };
+  if (isAllowedOrigin(origin)) Object.assign(headers, corsHeaders(origin));
+  return new Response(JSON.stringify(payload), { status, headers });
+}
+
 // ── Main handler ──────────────────────────────────────────────────────────────
 export default {
   async fetch(request, env) {
     const origin = request.headers.get("Origin") || "";
     const anthropicApiKey = env?.ANTHROPIC_API_KEY;
+
+    // ── Health check (no auth, no upstream call) ──
+    const url = new URL(request.url);
+    if (request.method === "GET" && url.pathname === "/health") {
+      return jsonResponse(
+        200,
+        {
+          ok: true,
+          origin,
+          keyPresent: Boolean(anthropicApiKey && anthropicApiKey.trim()),
+        },
+        origin
+      );
+    }
 
     // ── CORS pre-flight ──
     if (request.method === "OPTIONS") {
@@ -50,17 +70,17 @@ export default {
     }
 
     // ── Only POST /v1/messages is exposed ──
-    const url = new URL(request.url);
     if (request.method !== "POST" || url.pathname !== "/v1/messages") {
-      return new Response("Not Found", { status: 404 });
+      return jsonResponse(404, { error: "Not Found" }, origin);
     }
 
     // ── Origin check ──
     if (!isAllowedOrigin(origin)) {
-      return new Response(
-        JSON.stringify({ error: "Origin not allowed" }),
-        { status: 403, headers: { "Content-Type": "application/json" } }
-      );
+      // Intentionally do not include CORS headers for disallowed origins.
+      return new Response(JSON.stringify({ error: "Origin not allowed" }), {
+        status: 403,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     // ── Validate body is JSON ──
@@ -68,19 +88,17 @@ export default {
     try {
       body = await request.json();
     } catch {
-      return new Response(
-        JSON.stringify({ error: "Invalid JSON body" }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
+      return jsonResponse(400, { error: "Invalid JSON body" }, origin);
     }
 
     // ── Guardrails: cap max_tokens to prevent runaway usage ──
-    if (body.max_tokens > 4000) body.max_tokens = 4000;
+    if (body.max_tokens > 500) body.max_tokens = 500;
 
     if (!anthropicApiKey) {
-      return new Response(
-        JSON.stringify({ error: "Server misconfiguration: missing ANTHROPIC_API_KEY" }),
-        { status: 500, headers: { "Content-Type": "application/json" } }
+      return jsonResponse(
+        500,
+        { error: "Server misconfiguration: missing ANTHROPIC_API_KEY" },
+        origin
       );
     }
 
