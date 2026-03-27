@@ -189,7 +189,7 @@ async function callClaude(prompt, useWebSearch = false) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       model: "claude-sonnet-4-20250514",
-      max_tokens: 500,
+      max_tokens: 4000,
       ...(tools ? { tools } : {}),
       messages: [{ role: "user", content: prompt }],
     }),

@@ -92,7 +92,7 @@ export default {
     }
 
     // ── Guardrails: cap max_tokens to prevent runaway usage ──
-    if (body.max_tokens > 500) body.max_tokens = 500;
+    if (body.max_tokens > 4000) body.max_tokens = 4000;
 
     if (!anthropicApiKey) {
       return jsonResponse(
